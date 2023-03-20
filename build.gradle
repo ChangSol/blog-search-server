@@ -27,8 +27,8 @@ subprojects {
     }
 
     compileJava {
-        //argument mapstrcut unmappedTarget ignore 처리
-        options.compilerArgs << '-Amapstruct.unmappedTargetPolicy=IGNORE'
+        //mapstrcut unmappedTarget 검출
+        options.compilerArgs << '-Amapstruct.unmappedTargetPolicy=ERROR'
     }
 
     dependencies {
