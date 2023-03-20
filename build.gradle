@@ -17,7 +17,7 @@ subprojects {
     apply plugin: 'java'
 
     group 'org.changsol'
-    version '1.0.0-SNAPSHOT'
+    version '0.0.1-SNAPSHOT'
 
     sourceCompatibility = '16'
     targetCompatibility = '16'
@@ -52,5 +52,14 @@ subprojects {
 
     test {
         useJUnitPlatform()
+    }
+
+    configurations.configureEach {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'org.hibernate' && details.requested.name == 'hibernate-core') {
+                details.useVersion '5.6.5.Final'
+                details.because 'hibernate 5.6.7.Final query error issue. 5.6.5.Final downgrade'
+            }
+        }
     }
 }

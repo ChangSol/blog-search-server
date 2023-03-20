@@ -2,13 +2,11 @@ bootJar { enabled = false }
 jar { enabled = true }
 
 dependencies {
-    //hibernate 버그로 인하여 다운그레이드
-    implementation 'org.hibernate:hibernate-core:5.6.5.Final'
     //spring MVC 등 Web API 를 위한 설정
     implementation 'org.springframework.boot:spring-boot-starter-web'
     //JPA 설정
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     //H2 DB 설정
     implementation 'com.h2database:h2'
-    implementation 'commons-io:commons-io:2.4'
+    implementation 'commons-io:commons-io:2.7'
 }
