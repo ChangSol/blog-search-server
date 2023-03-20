@@ -1,0 +1,10 @@
+bootJar { enabled = false }
+jar { enabled = true }
+
+dependencies {
+    //WebFlux
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    annotationProcessor 'org.springframework.boot:spring-boot-autoconfigure-processor'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    implementation project(':module-core')
+}

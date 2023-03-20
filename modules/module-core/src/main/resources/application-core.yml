@@ -1,0 +1,63 @@
+server:
+  shutdown: graceful #우아하게 진행로직 처리 후 종료
+  error:
+    include-message: always #Spring2.3부터 never가 default이므로 response에 담기지 않는 현상 해결
+
+spring:
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false #JSON 파싱 시 접근제한자 상관 없이 진행
+
+  servlet:
+    multipart:
+      max-file-size: 1GB #최대 파일업로드 1GB 제한
+      max-request-size: 1GB #파일업로드 요청 1GB 제한
+
+  output:
+    ansi:
+      enabled: always #console color set
+
+  main:
+    allow-bean-definition-overriding: true #bean overriding true
+
+logging:
+  level:
+    org.changsol: debug
+    org.hibernate.type.descriptor.sql: trace #SQL ?변수값
+    org.hibernate.SQL: debug #SQL DML
+  logback:
+    #logFile
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 10
+      file-name-pattern: ${app.host}.%d{yyyy-MM-dd}-%i.log
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  h2:
+    console:
+      enabled: true  # H2 console 사용
+      path: /h2  # console 경로
+
+  #DB설정
+  datasource:
+    #h2 드라이버 설정
+    driver-class-name: org.h2.Driver
+    #사용할 DB URL (Connection)
+    url: jdbc:h2:mem:blog_search
+    username: changsol  #ID
+    password: changsol^_^3  #PWD
+
+  #JPA 설정
+  jpa:
+    #사용할 DB 플랫폼
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop #JPA DDL 설정
+    properties:
+      hibernate:
+        show-sql: true #SQL Query 출력여부
+        format_sql: true #SQL Query Format

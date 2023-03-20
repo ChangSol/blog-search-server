@@ -1,0 +1,11 @@
+rootProject.name = 'blog-search-server'
+
+include 'module-core'
+include 'module-search'
+include 'module-external'
+
+//modules 폴더에 집합
+for (project in rootProject.children) {
+    project.projectDir = file("modules/${project.name}")
+}
+

@@ -1,0 +1,9 @@
+
+dependencies {
+    //spring MVC 등 Web API 를 위한 설정
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    //SpringDoc 설정
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
+    implementation project(':module-core')
+    implementation project(':module-external')
+}
