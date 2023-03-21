@@ -323,10 +323,6 @@ java -jar "-Dserver.port=사용할포트" blog-search-service-0.0.1-SNAPSHOT.jar
 ### 2) API Document
 - API Docs url : http://localhost:8080/swagger-ui
 
-[보여지는 텍스트](#이동할위치의텍스트)
-~생략~
-#이동할위치의텍스트
-
 ### 3) H2 DB
 - consol url : http://localhost:8080/h2
   ![img.png](readme_resource/img.png)
