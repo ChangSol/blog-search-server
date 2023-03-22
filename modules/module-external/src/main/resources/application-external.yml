@@ -1,0 +1,10 @@
+kakao:
+  host: https://dapi.kakao.com
+  blog-search-end-point: /v2/search/blog
+  rest-api-key: #Kakao REST_API_KEY INPUT
+
+naver:
+  host: https://openapi.naver.com
+  blog-search-end-point: /v1/search/blog.json
+  client-id: #Naver CLIENT_ID INPUT
+  client-secret: #Naver CLIENT_SECRET INPUT
