@@ -334,13 +334,13 @@ create table error_log (
 - 실행 명령어 (기본 8080 port)
 
 ```
-java -jar blog-search-service-0.0.1-SNAPSHOT.jar
+java -jar blog-search-server-0.0.1-SNAPSHOT.jar
 ```
 
 - 실행 명령어 (다른 port 사용 시)
 
 ```
-java -jar "-Dserver.port=사용할포트" blog-search-service-0.0.1-SNAPSHOT.jar
+java -jar "-Dserver.port=사용할포트" blog-search-server-0.0.1-SNAPSHOT.jar
 ```
 ### 2) API Document
 - API Docs url : http://localhost:8080/swagger-ui
