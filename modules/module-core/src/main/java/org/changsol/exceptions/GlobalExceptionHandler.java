@@ -1,25 +1,22 @@
 package org.changsol.exceptions;
 
 import com.google.common.collect.Lists;
-import java.nio.file.AccessDeniedException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.changsol.apps.logs.service.ErrorLogService;
+import org.changsol.exceptions.dto.ExceptionDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -27,59 +24,100 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class GlobalExceptionHandler {
 
 	private final ErrorLogService errorLogService;
+	private final HttpServletRequest httpServletRequest;
+
+	/**
+	 * Exception Global 처리
+	 */
 	@ExceptionHandler(Exception.class)
-	public void handleException(Exception ex) throws Exception {
-		ArrayList<Class<? extends Exception>> ignores = Lists.newArrayList(
-			AccessDeniedException.class,
-			ConstraintViolationException.class,
-			MethodArgumentTypeMismatchException.class,
-			BadRequestException.class
-		);
-
-		if (!ignores.contains(ex.getClass())) {
-			errorLogService.save(ex);
-		}
-
-		ex.printStackTrace();
-		throw ex;
+	protected ResponseEntity<ExceptionDto.Response> handleException(Exception ex) {
+		return ResponseEntity.internalServerError()
+							 .body(getExceptionResponseAndErrorLogSave(HttpStatus.INTERNAL_SERVER_ERROR, ex));
 	}
 
 	/**
-	 * MethodArgumentNotValidException 에 대한 전역 message 처리
+	 * BadRequestException Global 처리
 	 */
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-		Map<String, Object> errorMap = new LinkedHashMap<>();
-		errorMap.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		errorMap.put("status", 400);
-		errorMap.put("error", "MethodArgumentNotValidException");
-		errorMap.put("message", "Please check your enter");
-
-		Map<String, Object> errorFieldMap = new HashMap<>();
-		for (ObjectError objectError : ex.getBindingResult().getAllErrors()) {
-			String field = ((FieldError) objectError).getField();
-			String defaultMessage = objectError.getDefaultMessage();
-			errorFieldMap.put(field, defaultMessage);
-		}
-		errorMap.put("reason", errorFieldMap);
-		return ResponseEntity.badRequest().body(errorMap);
+	@ExceptionHandler(BadRequestException.class)
+	protected ResponseEntity<ExceptionDto.Response> handleException(BadRequestException ex) {
+		// return ResponseEntity.badRequest().build();
+		return ResponseEntity.badRequest()
+							 .body(getExceptionResponseAndErrorLogSave(HttpStatus.BAD_REQUEST, ex));
 	}
 
-	@ExceptionHandler(value = {ConstraintViolationException.class})
-	protected ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex) {
-		Map<String, Object> errorMap = new LinkedHashMap<>();
-		errorMap.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		errorMap.put("status", 400);
-		errorMap.put("error", "ConstraintViolationException");
-		errorMap.put("message", "Please check your enter");
+	/**
+	 * BindException Global 처리
+	 */
+	@ExceptionHandler(BindException.class)
+	protected ResponseEntity<ExceptionDto.Response> handleBindException(BindException ex) {
+		return ResponseEntity.badRequest()
+							 .body(getExceptionResponseAndErrorLogSave(HttpStatus.BAD_REQUEST, ex));
+	}
 
-		Map<String, Object> errorFieldMap = new HashMap<>();
-		for (ConstraintViolation<?> constraintViolation : ex.getConstraintViolations()) {
-			String field = constraintViolation.getPropertyPath() != null ? constraintViolation.getPropertyPath().toString() : "";
-			String defaultMessage = constraintViolation.getMessage();
-			errorFieldMap.put(field, defaultMessage);
+	/**
+	 * MethodArgumentNotValidException Global 처리
+	 */
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	protected ResponseEntity<ExceptionDto.Response> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+		return ResponseEntity.badRequest()
+							 .body(getExceptionResponseAndErrorLogSave(HttpStatus.BAD_REQUEST, ex));
+	}
+
+	/**
+	 * ConstraintViolationException Global 처리
+	 */
+	@ExceptionHandler(value = {ConstraintViolationException.class})
+	protected ResponseEntity<ExceptionDto.Response> handleConstraintViolationException(ConstraintViolationException ex) {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+							 .body(getExceptionResponseAndErrorLogSave(HttpStatus.CONFLICT, ex));
+	}
+
+	/**
+	 * ConstraintViolationException Global 처리
+	 */
+	@ExceptionHandler(value = {WebClientException.class})
+	protected ResponseEntity<ExceptionDto.Response> handleConstraintViolationException(WebClientException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+							 .body(getExceptionResponseAndErrorLogSave(HttpStatus.BAD_GATEWAY, ex));
+	}
+
+
+	private ExceptionDto.Response getExceptionResponseAndErrorLogSave(HttpStatus httpStatus, Exception ex) {
+		ExceptionDto.Response.ResponseBuilder reponseBuilder = ExceptionDto.Response.builder()
+																					.status(httpStatus)
+																					.statusCode(httpStatus.value())
+																					.errorClass(ex.getClass().getName())
+																					.requestUri(httpServletRequest.getRequestURI());
+
+		if (ex instanceof ConstraintViolationException constraintViolationException) {
+			List<ExceptionDto.FieldErrorResponse> fieldErrors = Lists.newArrayList();
+			for (ConstraintViolation<?> constraintViolation : constraintViolationException.getConstraintViolations()) {
+				String field = constraintViolation.getPropertyPath() != null ? constraintViolation.getPropertyPath().toString() : "";
+				String defaultMessage = constraintViolation.getMessage();
+				fieldErrors.add(ExceptionDto.FieldErrorResponse.builder()
+															   .fieldName(field)
+															   .errorMessage(defaultMessage)
+															   .build());
+			}
+			reponseBuilder.errorMessage("Data is constraint violation Error");
+			reponseBuilder.fieldErrors(fieldErrors);
+		} else if (ex instanceof BindException bindException) {
+			List<ExceptionDto.FieldErrorResponse> fieldErrors = Lists.newArrayList();
+			for (FieldError fieldError : bindException.getFieldErrors()) {
+				String field = fieldError.getField();
+				String defaultMessage = fieldError.getDefaultMessage();
+				fieldErrors.add(ExceptionDto.FieldErrorResponse.builder()
+															   .fieldName(field)
+															   .errorMessage(defaultMessage)
+															   .build());
+			}
+			reponseBuilder.errorMessage("Binding Error");
+			reponseBuilder.fieldErrors(fieldErrors);
+		} else {
+			reponseBuilder.errorMessage(StringUtils.isBlank(ex.getMessage()) ? ex.toString() : ex.getMessage());
 		}
-		errorMap.put("reason", errorFieldMap);
-		return ResponseEntity.badRequest().body(errorMap);
+		errorLogService.save(httpStatus, ex);
+		ex.printStackTrace();
+		return reponseBuilder.build();
 	}
 }

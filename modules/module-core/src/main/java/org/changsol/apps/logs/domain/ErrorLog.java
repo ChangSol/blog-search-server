@@ -1,57 +1,95 @@
 package org.changsol.apps.logs.domain;
 
-import java.io.IOException;
+import java.util.Optional;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
+import javax.persistence.PrePersist;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.changsol.utils.bases.domain.ChangSolBaseDomainLog;
+import org.changsol.utils.bases.domain.ChangSolBaseDomainIdentity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Slf4j
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class ErrorLog extends ChangSolBaseDomainLog {
+public class ErrorLog extends ChangSolBaseDomainIdentity {
 
 	/**
-	 * 오류 바인딩 함수
+	 * 오류 상태
 	 */
-	public ErrorLog(Exception ex) {
-		this.message = ex.getMessage();
-		this.className = ex.getClass().getName();
-		this.detailMessage = ex.toString();
+	@Builder.Default
+	private String status = HttpStatus.INTERNAL_SERVER_ERROR.name();
 
-		getHttpServletRequest()
-			.ifPresent(httpServletRequest -> {
-				this.querystring = httpServletRequest.getQueryString();
+	/**
+	 * 오류 상태코드
+	 */
+	@Builder.Default
+	private Integer statusCode = HttpStatus.INTERNAL_SERVER_ERROR.value();
 
-				try {
-					if (httpServletRequest.getReader() != null) {
-						this.data = IOUtils.toString(httpServletRequest.getReader());
-					}
-				} catch (IOException ex1) {
-					log.error("IO Header Error");
-				} catch (IllegalStateException ise) {
-					log.error("IllegalStateException Error");
-				}
-			});
-	}
+	/**
+	 * 오류 클래스명
+	 */
+	private String errorClass;
+
+	/**
+	 * 오류 메시지
+	 */
+	@Lob
+	private String errorMessage;
+
+	private String remoteAddr;
+
+	private String userAgent;
 
 	@Lob
-	private String message;
-
-	private String className;
+	private String origin;
 
 	@Lob
-	private String detailMessage;
+	private String requestUri;
 
+	private String method;
+
+	/**
+	 * 오류 요청 데이터
+	 */
 	@Lob
 	private String data;
 
+	/**
+	 * 오류 요청 query
+	 */
 	@Lob
-	private String querystring;
+	private String query;
 
+	@PrePersist
+	public void prePersist() {
+		Optional.ofNullable(RequestContextHolder.getRequestAttributes())
+				.filter(ServletRequestAttributes.class::isInstance)
+				.map(ServletRequestAttributes.class::cast)
+				.map(ServletRequestAttributes::getRequest)
+				.ifPresent(httpServletRequest -> {
+					this.remoteAddr = httpServletRequest.getRemoteAddr();
+					this.userAgent = httpServletRequest.getHeader(HttpHeaders.USER_AGENT);
+					this.origin = httpServletRequest.getHeader(HttpHeaders.ORIGIN);
+					this.requestUri = httpServletRequest.getRequestURI();
+					this.method = httpServletRequest.getMethod();
+					this.query = httpServletRequest.getQueryString();
+
+					try {
+						if (httpServletRequest.getReader() != null) {
+							this.data = IOUtils.toString(httpServletRequest.getReader());
+						}
+					} catch (Exception ignore) {
+					}
+				});
+	}
 }
