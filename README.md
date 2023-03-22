@@ -324,6 +324,9 @@ create table error_log (
 </table>
 
 ## 4. 테스트 케이스
+<p align="left">
+<img src="readme_resource/test_case.jpg" height="200px" width="300px">
+</p>
 
 ## 5. 실행 및 API Docs
 ### 1) 실행 방법
