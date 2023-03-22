@@ -97,11 +97,30 @@ public class SwaggerConfig {
 	}
 }
 ```
+- module-external 외부 KEY 필요 (module-external yml 참고)
+```yaml
+kakao:
+  host: https://dapi.kakao.com
+  blog-search-end-point: /v2/search/blog
+  rest-api-key: #Kakao REST_API_KEY INPUT
+
+naver:
+  host: https://openapi.naver.com
+  blog-search-end-point: /v1/search/blog.json
+  client-id: #Naver CLIENT_ID INPUT
+  client-secret: #Naver CLIENT_SECRET INPUT
+```
 
 ### 2) 외부 라이브러리
-
-- Lombok 1.18.20 (보일러플레이트 처리)
-- MapStruct 1.5.2 (Data Mapper로 사용)
+- module 
+  - lombok:1.18.2 => 보일러플레이트 처리.
+  - mapstruct:1.5.2.Final => Class간 변환을 처리하기 위한 매퍼 클래스. DTO->Entity, Entity->DTO, DTO->DTO 등
+  - guava:31.1-jre => Google Core 라이브러리. 주로 collection 초기화에 사용하였음
+  - commons-lang3:3.12.0 => Lang 유틸리티로 사용.
+  - commons-collections4:4.4 => Colletion 유틸리티로 사용.
+  - commons-io:2.7 => Apache IO 라이브러리. DataReader 등 읽기에 사용하였음
+- module-search
+  - springdoc-openapi-ui:1.6.14 => API Docs를 위한 라이브러리. Swagger 작성 
 
 ### 3) 모듈 구조
 
