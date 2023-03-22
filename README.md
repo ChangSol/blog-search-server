@@ -344,6 +344,7 @@ java -jar "-Dserver.port=사용할포트" blog-search-service-0.0.1-SNAPSHOT.jar
 
 ### 3) H2 DB
 - consol url : http://localhost:8080/h2
-  ![img.png](readme_resource/img.png)
 - 계정 : [H2 DB 관련 내용 참고](#2-environment)
- 
+<p align="left">
+<img src="readme_resource/h2.png" height="200px" width="300px">
+</p>
