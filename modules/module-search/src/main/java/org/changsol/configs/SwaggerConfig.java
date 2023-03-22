@@ -22,7 +22,7 @@ public class SwaggerConfig {
                 .version(appVersion)
                 .description("창솔 블로그 검색 서비스에 오신걸 환영합니다.😁")
                 .contact(new Contact().name("changsol-github").url("https://github.com/ChangSol"))
-                .license(new License().name("Apache License Version 2.0").url("http://www.apache.org/licenses/LICENSE-2.0"));
+                .license(new License().name("Apache License Version 2.0").url("https://www.apache.org/licenses/LICENSE-2.0"));
 
         return new OpenAPI()
                 .components(new Components())

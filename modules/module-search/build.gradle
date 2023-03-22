@@ -1,3 +1,6 @@
+bootJar {
+    archivesBaseName = 'blog-search-server'
+}
 
 dependencies {
     //spring MVC 등 Web API 를 위한 설정
