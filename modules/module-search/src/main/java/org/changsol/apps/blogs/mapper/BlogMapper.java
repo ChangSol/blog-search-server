@@ -27,8 +27,10 @@ public interface BlogMapper {
 	/**
 	 * 카카오 Request DTO Mapping
 	 */
-	@Mapping(source = "keyword", target = "query")
-	@Mapping(source = "sort", target = "sort", qualifiedByName = "toKakaoBlogSort")
+	@Mappings({
+		@Mapping(source = "keyword", target = "query"),
+		@Mapping(source = "sort", target = "sort", qualifiedByName = "toKakaoBlogSort")
+	})
 	KakaoBlogDto.Request toKakaoRequest(BlogDto.Request request);
 
 	/**
@@ -57,10 +59,12 @@ public interface BlogMapper {
 	/**
 	 * 네이버 Request DTO Mapping
 	 */
-	@Mapping(source = "keyword", target = "query")
-	@Mapping(source = "sort", target = "sort", qualifiedByName = "toNaverBlogSort")
-	@Mapping(source = "request", target = "start", qualifiedByName = "toNaverStart")
-	@Mapping(source = "size", target = "display")
+	@Mappings({
+		@Mapping(source = "keyword", target = "query"),
+		@Mapping(source = "sort", target = "sort", qualifiedByName = "toNaverBlogSort"),
+		@Mapping(source = "request", target = "start", qualifiedByName = "toNaverStart"),
+		@Mapping(source = "size", target = "display")
+	})
 	NaverBlogDto.Request toNaverRequest(BlogDto.Request request);
 
 	/**
@@ -96,7 +100,7 @@ public interface BlogMapper {
 
 	// region RESPONSE
 
-	//region 블로그 검색
+	// region 블로그 검색
 
 	// region KAKAO
 
@@ -176,7 +180,7 @@ public interface BlogMapper {
 		return isEnd != null && !isEnd;
 	}
 	// endregion
-	//endregion
+	// endregion
 
 	//  region 인기검색어
 	List<BlogDto.KeywordTopResponse> toKeywordTopResponse(List<BlogSearchKeyword> blogSearchKeywords);
