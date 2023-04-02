@@ -190,7 +190,7 @@ create table error_log (
   </tr>
   <tr>
     <td>409</td>
-    <td>요청 데이터에 대한 충돌</td>
+    <td>데이터에 대한 충돌</td>
   </tr>
 </table>
 
@@ -316,6 +316,27 @@ create table error_log (
         "errorMessage": "정렬 방식은 필수입니다."
       }
     ]
+  }
+  ```
+
+  </td>
+  </tr>
+
+  <tr>
+    <td>DataIntegrityViolationException</td>
+    <td>409</td>
+    <td>데이터에 대한 충돌 발생</td>
+    <td>
+
+  ```json
+  {
+    "timestamp": "2023-04-02 17:18:43.965",
+    "status": "CONFLICT",
+    "statusCode": 409,
+    "errorClass": "org.springframework.dao.DataIntegrityViolationException",
+    "errorMessage": "could not execute statement; SQL [n/a]; constraint [\"PUBLIC.UK_T6GQ849H0617PY99WS528RLDV_INDEX_8 ON PUBLIC.BLOG_SEARCH_KEYWORD(KEYWORD2) VALUES 1\"; SQL statement:\ninsert into blog_search_keyword (created_at, updated_at, count, keyword2, version, keyword) values (?, ?, ?, ?, ?, ?) [23505-200]]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement",
+    "requestUri": "/v1/blogs",
+    "fieldErrors": []
   }
   ```
 

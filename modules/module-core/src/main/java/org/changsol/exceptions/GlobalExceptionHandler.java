@@ -10,8 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.changsol.apps.logs.service.ErrorLogService;
 import org.changsol.exceptions.dto.ExceptionDto;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -68,6 +70,24 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(value = {ConstraintViolationException.class})
 	protected ResponseEntity<ExceptionDto.Response> handleConstraintViolationException(ConstraintViolationException ex) {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+							 .body(getExceptionResponseAndErrorLogSave(HttpStatus.CONFLICT, ex));
+	}
+
+	/**
+	 * DataIntegrityViolationException Global 처리
+	 */
+	@ExceptionHandler(value = {DataIntegrityViolationException.class})
+	protected ResponseEntity<ExceptionDto.Response> handleConstraintViolationException(DataIntegrityViolationException ex) {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+							 .body(getExceptionResponseAndErrorLogSave(HttpStatus.CONFLICT, ex));
+	}
+
+	/**
+	 * ObjectOptimisticLockingFailureException Global 처리
+	 */
+	@ExceptionHandler(value = {ObjectOptimisticLockingFailureException.class})
+	protected ResponseEntity<ExceptionDto.Response> handleConstraintViolationException(ObjectOptimisticLockingFailureException ex) {
 		return ResponseEntity.status(HttpStatus.CONFLICT)
 							 .body(getExceptionResponseAndErrorLogSave(HttpStatus.CONFLICT, ex));
 	}
