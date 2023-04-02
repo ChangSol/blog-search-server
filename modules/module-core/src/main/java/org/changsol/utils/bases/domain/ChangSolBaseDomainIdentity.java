@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @MappedSuperclass //자식에게 매핑정보만 제공
-public class ChangSolBaseDomainIdentity extends ChangSolBaseDomain {
+public abstract class ChangSolBaseDomainIdentity extends ChangSolBaseDomain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
