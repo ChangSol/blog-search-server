@@ -351,6 +351,7 @@ create table error_log (
 
 ## 5. 실행 및 API Docs
 ### 1) 실행 방법
+XXX 23.06.06 이후로 시크릿키 변경됨. 따라서 기능 사용 불가.
 - [Executable JAR 다운로드](https://github.com/ChangSol/blog-search-server/raw/main/executable_jar/blog-search-server-0.0.1-SNAPSHOT.jar)
 - 실행 명령어 (기본 8080 port)
 
